@@ -1,0 +1,74 @@
+version: '3.7'
+services:
+  # DEBEZIUM_VERSION is stored in .env file, to allow for easier switching from version
+  # Zookeeper is where Kafka stores infomation abouts different nodes, e.g. itself
+  zookeeper:
+    image: debezium/zookeeper:${DEBEZIUM_VERSION}
+    ports:
+     - 2181:2181
+     - 2888:2888
+     - 3888:3888
+    volumes:
+      - zk-data:/zookeeper/data:rw
+      - zk-txns:/zookeeper/txns:rw
+      - zk-logs:/zookeeper/logs:rw
+  # Kafka, one node. In production you'd want two or more kafka nodes    
+  kafka:
+    image: debezium/kafka:${DEBEZIUM_VERSION}
+    ports:
+     - 9092:9092
+    links:
+     - zookeeper
+    environment:
+     - ZOOKEEPER_CONNECT=zookeeper:2181
+    volumes:
+      - kafka-data:/kafka/data:rw
+      - kafka-logs:/kafka/logs:rw
+  # Example sqlserver instance
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2017-latest
+    ports:
+     - 1433:1433
+    environment:
+     - ACCEPT_EULA=Y
+     - MSSQL_PID=Standard
+     - SA_PASSWORD=Password123
+     - MSSQL_AGENT_ENABLED=true
+  # Kafka connect, with Debezium connectors (e.g. plugins) added.
+  connect:
+    image: debezium/connect:${DEBEZIUM_VERSION}
+    ports:
+     - 8083:8083
+    links:
+     - kafka
+     - sqlserver
+    environment:
+     - BOOTSTRAP_SERVERS=kafka:9092
+     - GROUP_ID=1
+     - CONFIG_STORAGE_TOPIC=my_connect_configs
+     - OFFSET_STORAGE_TOPIC=my_connect_offsets
+     - STATUS_STORAGE_TOPIC=my_connect_statuses
+# AKHQ, a Kafka UI, From https://github.com/tchiotludo/akhq/blob/dev/docker-compose.yml
+  akhq:
+    image: tchiotludo/akhq
+    environment:
+      AKHQ_CONFIGURATION: |
+        akhq:
+          connections:
+            docker-kafka-server:
+              properties:
+                bootstrap.servers: "kafka:9092"
+              connect:
+                - name: "connect"
+                  url: "http://connect:8083"
+    ports:
+      - "8080:8080"
+    links:
+      - kafka
+      - connect
+volumes:
+  zk-data:
+  zk-txns:
+  zk-logs:
+  kafka-data:
+  kafka-logs:

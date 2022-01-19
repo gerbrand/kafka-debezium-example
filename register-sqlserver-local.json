@@ -1,0 +1,15 @@
+{
+    "name": "sqlserver-local-docker-connector",
+    "config": {
+        "connector.class" : "io.debezium.connector.sqlserver.SqlServerConnector",
+        "tasks.max" : "1",
+        "database.server.name" : "sqlserverlocaltest1",
+        "database.hostname" : "localhost",
+        "database.port" : "1433",
+        "database.user" : "sa",
+        "database.password" : "Password123",
+        "database.dbname" : "dbo",
+        "database.history.kafka.bootstrap.servers" : "kafka:9092",
+        "database.history.kafka.topic": "schema-changes.sqlservertest1"
+    }
+}
