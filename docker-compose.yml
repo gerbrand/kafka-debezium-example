@@ -13,7 +13,7 @@ services:
       - zk-txns:/zookeeper/txns:rw
       - zk-logs:/zookeeper/logs:rw
   # Kafka, one node. In production you'd want two or more kafka nodes    
-    kafka:
+  kafka:
       image: debezium/kafka:${DEBEZIUM_VERSION}
       ports:
       - 9094:9094
