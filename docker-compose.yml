@@ -13,17 +13,43 @@ services:
       - zk-txns:/zookeeper/txns:rw
       - zk-logs:/zookeeper/logs:rw
   # Kafka, one node. In production you'd want two or more kafka nodes    
-  kafka:
-    image: debezium/kafka:${DEBEZIUM_VERSION}
-    ports:
-     - 9092:9092
-    links:
-     - zookeeper
-    environment:
-     - ZOOKEEPER_CONNECT=zookeeper:2181
+    kafka:
+      image: debezium/kafka:${DEBEZIUM_VERSION}
+      ports:
+      - 9094:9094
+      links:
+      - zookeeper
+      environment:
+        # Set the KAFKA_ADVERTISED_HOST_NAME to your laptop/work computer's hostname during development
+        - "KAFKA_ADVERTISED_HOST_NAME=${KAFKA_ADVERTISED_HOST_NAME}"
+        - "ZOOKEEPER_CONNECT=zookeeper:2181"
+        - "KAFKA_ADVERTISED_LISTENERS=INSIDE://:9092,OUTSIDE://${KAFKA_ADVERTISED_HOST_NAME}:9094"
+        - "KAFKA_LISTENERS=INSIDE://:9092,OUTSIDE://:9094"
+        - "KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT"
+        - "KAFKA_INTER_BROKER_LISTENER_NAME=INSIDE"     
     volumes:
       - kafka-data:/kafka/data:rw
       - kafka-logs:/kafka/logs:rw
+
+  # Example postgres instance
+  postgres:
+    image: debezium/example-postgres:${DEBEZIUM_VERSION}
+    ports:
+     - 5432:5432
+    environment:
+     - POSTGRES_USER=postgres
+     - POSTGRES_PASSWORD=postgres
+  
+  # Example mysql instance
+  mysql:
+    image: debezium/example-mysql:${DEBEZIUM_VERSION}
+    ports:
+     - 3306:3306
+    environment:
+     - MYSQL_ROOT_PASSWORD=debezium
+     - MYSQL_USER=mysqluser
+     - MYSQL_PASSWORD=mysqlpw
+
   # Example sqlserver instance
   sqlserver:
     image: mcr.microsoft.com/mssql/server:2017-latest
@@ -34,6 +60,7 @@ services:
      - MSSQL_PID=Standard
      - SA_PASSWORD=Password123
      - MSSQL_AGENT_ENABLED=true
+
   # Kafka connect, with Debezium connectors (e.g. plugins) added.
   connect:
     image: debezium/connect:${DEBEZIUM_VERSION}

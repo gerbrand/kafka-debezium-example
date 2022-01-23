@@ -10,6 +10,25 @@ To run the example, docker and docker-compose have to be installed. When using L
 To run the example install docker and docker-compose.
 
 ## Registering connector
+### MySQL
+To register a connector for the sample mysql instance you can use the rest inferface of Kafka-Connect.
+
+To get started easily, I've added an example connector.  
+```curl -i -X POST -H "Accept:application/json" -H  "Content-Type:application/json" http://localhost:8083/connectors/ -d @register-mysql-local.json```
+
+The sample image, from the Debezium tutorial contains some sample data.
+
+In case your wondering, you can try to use the mysql connector also to connect to MariaDB, a fork of Mysql. MariaDB is up to a certain extend compatible with Mysql.
+
+### Postgresql
+To register a connector for the sample postgres instance you can use the rest inferface of Kafka-Connect.
+
+To get started easily, I've added an example connector.  
+```curl -i -X POST -H "Accept:application/json" -H  "Content-Type:application/json" http://localhost:8083/connectors/ -d @register-postgres-local.json```
+
+The sample image, from the Debezium tutorial contains some sample data.
+
+
 ### SQLServer
 To register a connector for the sample sqlserver instance you can use the rest inferface of Kafka-Connect.
 
