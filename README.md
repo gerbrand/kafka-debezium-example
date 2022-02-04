@@ -1,9 +1,9 @@
 # kafka-debezium-example
-Example for a dev setup for Kafka and Debezium. Inspired by [tutorial of Debezium](https://github.com/debezium/debezium-examples/tree/main/tutorial).
+Example for a dev setup using docker-compose for Kafka and Debezium. Inspired by [tutorial of Debezium](https://github.com/debezium/debezium-examples/tree/main/tutorial).
 
 The docker-compose file defines a single node kafka cluster along with connect. Additionally [akhq](https://akhq.io) is added, a kafka ui to more easily what data is in your local kafka instance.
 
-## Prerequises
+## Prerequisites
 To run the example, docker and docker-compose have to be installed. When using Linux, you could use the docker as packaged for your distribution. On MS-Windows and Mac, you could use [Docker Desktop](https://www.docker.com/products/docker-desktop), which is [free for personal use](https://www.docker.com/products/personal).
 
 ## Starting
