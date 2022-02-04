@@ -1,0 +1,46 @@
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaConnect
+metadata:
+  name: my-connect-cluster
+  annotations:
+    strimzi.io/use-connector-resources: "true"
+spec:
+  replicas: 1
+  bootstrapServers: my-cluster-kafka-bootstrap:9092
+  config:
+    group.id: my-connect-cluster
+    offset.storage.topic: my-connect-cluster-offsets
+    config.storage.topic: my-connect-cluster-configs
+    status.storage.topic: my-connect-cluster-status
+    key.converter: org.apache.kafka.connect.json.JsonConverter
+    value.converter: org.apache.kafka.connect.json.JsonConverter
+    key.converter.schemas.enable: true
+    value.converter.schemas.enable: true
+    config.storage.replication.factor: 2
+    offset.storage.replication.factor: 2
+    status.storage.replication.factor: 2
+  build:
+    output:
+      type: docker
+      image: my-reg.io/my-org/my-connect-cluster:latest
+      pushSecret: my-registry-credentials
+    plugins:
+      - name: debezium-connector-mysql
+        artifacts:
+          - type: tgz
+            url: https://repo1.maven.org/maven2/io/debezium/debezium-connector-mysql/1.8.0.Final/debezium-connector-mysql-1.8.0.Final-plugin.tar.gz
+            sha512sum: d85c26275a82d22559185311408bbafdf74e2240c27d505d68c1c9cb038673abe4212806edfea6c5228ed72cf7f6715b40a8e9e1f17c79e5a7c48209274c72bc
+      - name: debezium-postgres-mysql
+        artifacts:
+          - type: tgz
+            url: https://repo1.maven.org/maven2/io/debezium/debezium-connector-sqlserver/1.8.0.Final/debezium-connector-postgres-1.8.0.Final-plugin.tar.gz
+            sha512sum: 403cd3e6dc97c45791fbb3adffd7b9cc8d0c2669eff8aafcaaef3de93d729490d5017ed6bb5559ec5457cd62bf6f7470e672aefc1494b93dcc0670c89741908f
+      - name: debezium-sqlserver-mysql
+        artifacts:
+          - type: tgz
+            url: https://repo1.maven.org/maven2/io/debezium/debezium-connector-sqlserver/1.8.0.Final/debezium-connector-sqlserver-1.8.0.Final-plugin.tar.gz
+            sha512sum: 810040385808e526b49b16be2c54db7d8bbd6d8c91e5f0a05727b23acfeee72f53466da725c6ae4e8180c60d776367c7b1137e32818fe1724975f72f57349966
+  template:
+    pod:
+      imagePullSecrets:
+        - name: my-registry-credentials
