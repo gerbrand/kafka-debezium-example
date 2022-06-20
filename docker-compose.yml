@@ -27,15 +27,13 @@ services:
         - "KAFKA_LISTENERS=INSIDE://:9092,OUTSIDE://:9094"
         - "KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT"
         - "KAFKA_INTER_BROKER_LISTENER_NAME=INSIDE"     
-    volumes:
-      - kafka-data:/kafka/data:rw
-      - kafka-logs:/kafka/logs:rw
+      volumes:
+        - kafka-data:/kafka/data:rw
+        - kafka-logs:/kafka/logs:rw
 
   # Example postgres instance
   postgres:
     image: debezium/example-postgres:${DEBEZIUM_VERSION}
-    ports:
-     - 5432:5432
     environment:
      - POSTGRES_USER=postgres
      - POSTGRES_PASSWORD=postgres
@@ -69,12 +67,15 @@ services:
     links:
      - kafka
      - sqlserver
+     - apicurio-registry
     environment:
      - BOOTSTRAP_SERVERS=kafka:9092
      - GROUP_ID=1
      - CONFIG_STORAGE_TOPIC=my_connect_configs
      - OFFSET_STORAGE_TOPIC=my_connect_offsets
+     - ENABLE_APICURIO_CONVERTERS=true
      - STATUS_STORAGE_TOPIC=my_connect_statuses
+
 # AKHQ, a Kafka UI, From https://github.com/tchiotludo/akhq/blob/dev/docker-compose.yml
   akhq:
     image: tchiotludo/akhq
@@ -85,6 +86,8 @@ services:
             docker-kafka-server:
               properties:
                 bootstrap.servers: "kafka:9092"
+              schema-registry:
+                url: "http://apicurio-registry:8080"
               connect:
                 - name: "connect"
                   url: "http://connect:8083"
@@ -93,9 +96,39 @@ services:
     links:
       - kafka
       - connect
+
+  apicurio-registry:
+    image: apicurio/apicurio-registry-jpa:1.3.2.Final
+    hostname: apicurio-registry
+    depends_on:
+      - postgres-apicurio
+    ports:
+      - "8085:8080"
+    environment:
+      - "QUARKUS_PROFILE=prod"
+      - "QUARKUS_DATASOURCE_URL=jdbc:postgresql://postgres-apicurio/apicurio-registry"
+      - "QUARKUS_DATASOURCE_USERNAME=apicurio-registry"
+      - "QUARKUS_DATASOURCE_PASSWORD=password"
+      - "REGISTRY_DATASOURCE_URL=jdbc:postgresql://postgres-apicurio/apicurio-registry"
+      - "REGISTRY_DATASOURCE_USERNAME=apicurio-registry"
+      - "REGISTRY_DATASOURCE_PASSWORD=password"
+
+
+  postgres-apicurio:
+    image: postgres
+    hostname: schema-registry-db
+    environment:
+      - "POSTGRES_USER=apicurio-registry"
+      - "POSTGRES_PASSWORD=password"
+      - "PGDATA=/var/lib/postgresql/data/pgdata"
+    volumes:
+      - postgres-apicurio-data:/var/lib/postgresql/data/pgdata
+
 volumes:
   zk-data:
   zk-txns:
   zk-logs:
   kafka-data:
   kafka-logs:
+  postgres-data:
+  postgres-apicurio-data:

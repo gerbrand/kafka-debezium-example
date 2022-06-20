@@ -12,6 +12,8 @@ To run the example install docker and docker-compose.
 ## Registering connector
 This repository contains a few example connector configurations. To test to your own database, you could start by copying and update the above json file.
 
+If you prefer you can also add connector via the [akhq gui](http://localhost:8080/ui/docker-kafka-server/connect/connect/create).
+
 After registering, you might want to see the follow the log-output of kafka connect to see if and what's happening:  
 ```docker-compose logs -f --tail 100 connect```
 
