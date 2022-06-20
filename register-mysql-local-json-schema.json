@@ -12,15 +12,13 @@
         "database.include.list": "inventory",
         "database.history.kafka.bootstrap.servers": "kafka:9092",
         "database.history.kafka.topic": "schema-changes.inventory",
-        "key.converter": "io.apicurio.registry.utils.converter.AvroConverter",
+        "key.converter": "io.apicurio.registry.utils.converter.ExtJsonConverter",
+        "key.converter.schemas.enable": "true",
         "key.converter.apicurio.registry.url": "http://apicurio-registry:8080/api",
         "key.converter.apicurio.registry.global-id": "io.apicurio.registry.utils.serde.strategy.GetOrCreateIdStrategy",
-        "key.converter.apicurio.registry.auto-register": "true",
-        "key.converter.apicurio.registry.find-latest": "true",
-        "value.converter": "io.apicurio.registry.utils.converter.AvroConverter",
+        "value.converter": "io.apicurio.registry.utils.converter.ExtJsonConverter",
+        "value.converter.schemas.enable": "true",
         "value.converter.apicurio.registry.url": "http://apicurio-registry:8080/api",
-        "value.converter.apicurio.registry.global-id": "io.apicurio.registry.utils.serde.strategy.GetOrCreateIdStrategy",
-        "value.converter.apicurio.registry.auto-register": "true",
-        "value.converter.apicurio.registry.find-latest": "true"
+        "value.converter.apicurio.registry.global-id": "io.apicurio.registry.utils.serde.strategy.GetOrCreateIdStrategy"
     }
 }

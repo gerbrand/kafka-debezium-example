@@ -87,7 +87,7 @@ services:
               properties:
                 bootstrap.servers: "kafka:9092"
               schema-registry:
-                url: "http://apicurio-registry:8080"
+                url: "http://apicurio-registry:8080/apis/registry/v2"
               connect:
                 - name: "connect"
                   url: "http://connect:8083"
@@ -98,17 +98,13 @@ services:
       - connect
 
   apicurio-registry:
-    image: apicurio/apicurio-registry-jpa:1.3.2.Final
+    image: apicurio/apicurio-registry-sql:2.0.0.Final
     hostname: apicurio-registry
     depends_on:
       - postgres-apicurio
     ports:
       - "8085:8080"
     environment:
-      - "QUARKUS_PROFILE=prod"
-      - "QUARKUS_DATASOURCE_URL=jdbc:postgresql://postgres-apicurio/apicurio-registry"
-      - "QUARKUS_DATASOURCE_USERNAME=apicurio-registry"
-      - "QUARKUS_DATASOURCE_PASSWORD=password"
       - "REGISTRY_DATASOURCE_URL=jdbc:postgresql://postgres-apicurio/apicurio-registry"
       - "REGISTRY_DATASOURCE_USERNAME=apicurio-registry"
       - "REGISTRY_DATASOURCE_PASSWORD=password"
